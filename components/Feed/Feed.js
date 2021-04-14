@@ -25,7 +25,7 @@ export default function Feed({ posts, initial = 0, }) {
   ))
 
   return (
-    <div className="h-screen overflow-y-scroll">
+    <div className="w-screen h-screen overflow-y-scroll">
       {renders}
     </div>
   )

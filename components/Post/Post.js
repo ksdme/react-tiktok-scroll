@@ -1,6 +1,6 @@
 export default function Post({ post }) {
   return (
-    <div className="w-screen h-screen flex items-center">
+    <div className="w-screen h-screen flex justify-center items-center">
       <div className="p-8">
         <h2 className="font-bold text-xl text-black">
           {post.name}

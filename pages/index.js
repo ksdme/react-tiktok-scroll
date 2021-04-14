@@ -1,10 +1,19 @@
 import Head from 'next/head'
-import Post from '../components/Post/Post'
+import Feed from '../components/Feed/Feed'
 
 const post = {
+  key: 0,
   name: 'Post #0',
   nonce: 'Something is wrong. ',
 }
+
+const posts = [
+  { ...post, key: 0, name: 'Post #0' },
+  { ...post, key: 1, name: 'Post #1' },
+  { ...post, key: 2, name: 'Post #2' },
+  { ...post, key: 3, name: 'Post #3' },
+  { ...post, key: 4, name: 'Post #4' },
+]
 
 export default function Home() {
   return (
@@ -27,9 +36,7 @@ export default function Home() {
         />
       </Head>
 
-      <main className="w-full h-full flex items-center">
-        <Post post={post} />
-      </main>
+      <Feed posts={posts} />
     </>
   )
 }

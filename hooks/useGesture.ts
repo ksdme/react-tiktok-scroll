@@ -4,6 +4,7 @@ import { useRef } from 'react'
 interface GestureCallbackMeasure {
   delta: number
   speed: number
+  direction: 1 | -1
 }
 
 type GestureCallback = (
@@ -15,31 +16,26 @@ export default function useGesture(callback: GestureCallback) {
   const ref = useRef({
     startY: null,
     startedAt: null,
-    endY: null,
-    endedAt: null,
   })
 
   // Calculate measures from optional intermediate state.
-  const calculate = (endY = null, endedAt = null) => {
-    if (endY === null) {
-      endY = ref.current.endY
-    }
-
-    if (endedAt === null) {
-      endedAt = ref.current.endedAt
-    }
-
+  const calculate = (endY: number , endedAt: number): GestureCallbackMeasure => {
     const delta = ref.current.startY !== null && endY !== null
       ? endY - ref.current.startY
       : null
 
     const speed = ref.current.startedAt !== null && endedAt !== null && delta !== null
-      ? (endedAt - ref.current.startedAt) / delta
+      ? delta / (endedAt - ref.current.startedAt)
       : null
+
+    const direction = delta > 0
+      ? -1
+      : 1
 
     return {
       delta,
       speed,
+      direction,
     }
   }
 
@@ -73,7 +69,7 @@ export default function useGesture(callback: GestureCallback) {
 
     callback(
       'moving',
-      calculate(touch.screenY, touch.timeStamp),
+      calculate(touch.screenY, event.timeStamp),
     )
   }
 
@@ -85,13 +81,13 @@ export default function useGesture(callback: GestureCallback) {
       return
     }
 
-    ref.current.endY = touch.screenY
-    ref.current.endedAt = event.timeStamp
-
     callback(
       'end',
-      calculate(),
+      calculate(touch.screenY, event.timeStamp),
     )
+
+    ref.current.startY = null
+    ref.current.startedAt = null
   }
 
   return {

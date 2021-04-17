@@ -1,4 +1,7 @@
+import { useSpring, animated } from 'react-spring'
+import useGesture from '../../hooks/useGesture'
 import useScan from '../../hooks/useScan'
+import useWindowSize from '../../hooks/useWindowSize'
 import Post from '../Post/Post'
 
 export default function Feed({ posts, initial = 0, }) {
@@ -7,6 +10,79 @@ export default function Feed({ posts, initial = 0, }) {
     setCurrentPostIndex,
     scan,
   ] = useScan(posts, initial)
+
+  const [
+    _,
+    height,
+  ] = useWindowSize()
+
+  // Set the initial posistion of the view based on the position of
+  // the current element in the feed scan.
+  const initialY = scan.previous
+    ? -height
+    : 0
+
+  const [
+    animation,
+    spring,
+  ] = useSpring(() => ({
+    top: initialY,
+  }))
+
+  const bindings = useGesture((type, measure) => {
+    if (type === 'moving') {
+      return spring.start({
+        top: initialY + measure.delta,
+      })
+    }
+
+    if (type === 'end') {
+      // In case of a slow gesture, spring back to the initial position.
+      if (measure.delta <= height * 0.75 && Math.abs(measure.speed) < 0.5) {
+        return spring.start({
+          top: initialY,
+        })
+      }
+
+      if (measure.direction === 1) {
+        return spring.start({
+          top: scan.previous
+            ? -2 * height
+            : -height,
+          onRest: () => {
+            setCurrentPostIndex(
+              currentPostIndex + 1,
+            )
+
+            spring.start({
+              from: {
+                top: -height,
+              },
+            })
+          },
+        })
+      }
+
+      if (measure.direction === -1) {
+        return spring.start({
+          top: 0,
+          onRest: () => {
+            setCurrentPostIndex(
+              currentPostIndex - 1,
+            )
+
+            spring.start({
+              from: {
+                top: currentPostIndex - 1 !== 0
+                  ? -height
+                  : 0
+              },
+            })
+          },
+        })
+      }
+    }
+  })
 
   const elements = [
     scan.previous,
@@ -25,8 +101,10 @@ export default function Feed({ posts, initial = 0, }) {
   ))
 
   return (
-    <div className="w-screen h-screen overflow-y-scroll">
-      {renders}
+    <div className="w-screen h-screen overflow-y-hidden" {...bindings}>
+      <animated.div className="w-screen h-screen relative" style={animation}>
+        {renders}
+      </animated.div>
     </div>
   )
 }

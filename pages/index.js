@@ -13,6 +13,11 @@ const posts = [
   { ...post, key: 2, name: 'Post #2' },
   { ...post, key: 3, name: 'Post #3' },
   { ...post, key: 4, name: 'Post #4' },
+  { ...post, key: 5, name: 'Post #5' },
+  { ...post, key: 6, name: 'Post #6' },
+  { ...post, key: 7, name: 'Post #7' },
+  { ...post, key: 8, name: 'Post #8' },
+  { ...post, key: 9, name: 'Post #9' },
 ]
 
 export default function Home() {

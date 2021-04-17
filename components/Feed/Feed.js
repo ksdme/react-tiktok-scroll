@@ -29,7 +29,35 @@ export default function Feed({ posts, initial = 0, }) {
     top: initialY,
   }))
 
-  const bindings = useGesture((type, measure) => {
+  // Select next post in scan.
+  const nextSelect = () => {
+    setCurrentPostIndex(
+      currentPostIndex + 1,
+    )
+
+    spring.start({
+      from: {
+        top: -height,
+      },
+    })
+  }
+
+  // Select previous post in scan.
+  const previousSelect = () => {
+    setCurrentPostIndex(
+      currentPostIndex - 1,
+    )
+
+    spring.start({
+      from: {
+        top: currentPostIndex - 1 !== 0
+          ? -height
+          : 0,
+      },
+    })
+  }
+
+  const gestures = useGesture((type, measure) => {
     if (type === 'moving') {
       return spring.start({
         top: initialY + measure.delta,
@@ -49,36 +77,14 @@ export default function Feed({ posts, initial = 0, }) {
           top: scan.previous
             ? -2 * height
             : -height,
-          onRest: () => {
-            setCurrentPostIndex(
-              currentPostIndex + 1,
-            )
-
-            spring.start({
-              from: {
-                top: -height,
-              },
-            })
-          },
+          onRest: nextSelect,
         })
       }
 
       if (measure.direction === -1) {
         return spring.start({
           top: 0,
-          onRest: () => {
-            setCurrentPostIndex(
-              currentPostIndex - 1,
-            )
-
-            spring.start({
-              from: {
-                top: currentPostIndex - 1 !== 0
-                  ? -height
-                  : 0
-              },
-            })
-          },
+          onRest: previousSelect,
         })
       }
     }
@@ -101,7 +107,7 @@ export default function Feed({ posts, initial = 0, }) {
   ))
 
   return (
-    <div className="w-screen h-screen overflow-y-hidden" {...bindings}>
+    <div className="w-screen h-screen overflow-y-hidden" tabIndex="0" {...gestures}>
       <animated.div className="w-screen h-screen relative" style={animation}>
         {renders}
       </animated.div>

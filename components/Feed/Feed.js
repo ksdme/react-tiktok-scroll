@@ -65,11 +65,19 @@ export default function Feed({ posts, initial = 0, }) {
     }
 
     if (type === 'end') {
+      const resetInitialY = () => spring.start({
+        top: initialY,
+      })
+
       // In case of a slow gesture, spring back to the initial position.
       if (measure.delta <= height * 0.75 && Math.abs(measure.speed) < 0.5) {
-        return spring.start({
-          top: initialY,
-        })
+        return resetInitialY()
+      }
+
+      // In case the post is an boundary, reset to the initial position.
+      if ((!scan.next && measure.direction === 1) ||
+          (!scan.previous && measure.direction === -1)) {
+        return resetInitialY()
       }
 
       if (measure.direction === 1) {
@@ -107,7 +115,7 @@ export default function Feed({ posts, initial = 0, }) {
   ))
 
   return (
-    <div className="w-screen h-screen overflow-y-hidden" tabIndex="0" {...gestures}>
+    <div className="w-screen h-screen overflow-y-hidden focus:outline-none" tabIndex="0" {...gestures}>
       <animated.div className="w-screen h-screen relative" style={animation}>
         {renders}
       </animated.div>

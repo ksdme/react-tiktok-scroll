@@ -49,6 +49,9 @@ export default function useGesture(callback: GestureCallback) {
 
   // Handler for when the gesture starts.
   const onGestureStart = (event: any) => {
+    event.stopPropagation()
+
+    // Get the touch instance
     const touch = getTouch(event)
 
     if (touch === null) {
@@ -61,6 +64,9 @@ export default function useGesture(callback: GestureCallback) {
 
   // Handler for when the gesture is in progress.
   const onGestureMoving = (event: any) => {
+    event.stopPropagation()
+
+    // Get the touch instance
     const touch = getTouch(event)
 
     if (touch === null) {
@@ -75,6 +81,9 @@ export default function useGesture(callback: GestureCallback) {
 
   // Handler for when the gesture ends.
   const onGestureEnd = (event: any) => {
+    event.stopPropagation()
+
+    // Get the touch instance
     const touch = getTouch(event)
 
     if (touch === null) {
